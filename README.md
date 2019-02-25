@@ -1,6 +1,6 @@
 # Access Control Re
 
-A facade enhancing the great [Access Control](https://onury.io/accesscontrol), but with much desired missing features!
+A facade enhancing the great javascript [Access Control](https://onury.io/accesscontrol), but with much desired missing features!
 
 ## Features 
 
@@ -17,7 +17,8 @@ A facade enhancing the great [Access Control](https://onury.io/accesscontrol), b
         },
       }
       
-  This will actually allow any known *Action* against any known *Resource*, so use with caution! 
+  This will actually allow any known *Action* against any known *Resource*, so use with caution!
+   
 ## How to use
 
     import { IAccessInfo } from 'accesscontrol';
