@@ -1,0 +1,23 @@
+{
+  "extends": [
+    "tslint-config-airbnb",
+    "tslint-config-prettier"
+  ],
+  "rules": {
+    "no-increment-decrement": false,
+    "ter-indent": false,
+    "ter-arrow-parens": false,
+    "import-name": false,
+    "curly": [
+      false,
+      "ignore-same-line"
+    ],
+    "no-parameter-reassignment": false,
+    "object-shorthand-properties-first": false,
+    "variable-name": false,
+    "prefer-template": [
+      true,
+      "allow-single-concat"
+    ]
+  }
+}

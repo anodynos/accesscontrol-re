@@ -1,0 +1,12 @@
+/node_modules/
+/DRAFT/
+/coverage/
+/scripts/
+/nodemon*.json
+.editorconfig
+.gitignore
+.prettierrc
+/src/
+src/__tests__
+.idea/
+jest.config.js
