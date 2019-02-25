@@ -7,6 +7,7 @@
 .gitignore
 .prettierrc
 /src/
-src/__tests__
+build/src/__tests__
 .idea/
 jest.config.js
+tslint.json
