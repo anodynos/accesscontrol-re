@@ -8,21 +8,22 @@ export const accessInfos: IAccessInfo[] = [
     attributes: ['*'],
   },
   {
-    role: 'user',
+    role: ['user'],
     resource: 'post',
+    possession: 'any', // overriden by action's possession
     action: 'delete:own',
   },
   {
     role: 'admin',
     resource: 'comment',
-    action: 'delete',
     possession: 'any',
+    action: 'delete',
     attributes: ['*'],
   },
   {
-    role: 'admin',
+    role: ['admin'],
     resource: 'post',
-    action: 'approve:any',
+    action: 'approve', // possession `any` assumed
     attributes: ['*'],
   },
   {
@@ -33,6 +34,12 @@ export const accessInfos: IAccessInfo[] = [
   {
     role: 'poweruser',
     resource: '*',
-    action: '*:own',
+    possession: 'any',
+    action: '*:own', // overrides `possession: 'any'`
+  },
+  {
+    role: '*',
+    resource: 'openToAllResource',
+    action: 'look:any',
   },
 ];

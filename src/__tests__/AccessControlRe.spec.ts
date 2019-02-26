@@ -7,8 +7,8 @@ const ac: AccessControl = build();
 
 describe.only('AccessControlRe', () => {
   it(`returns all known getResources()`, () => {
-    expect(getResources()).toEqual(['comment', 'post']);
-    expect(getResources()).toEqual(ac.getResources());
+    expect(getResources()).toEqual(['comment', 'post', 'openToAllResource'].sort());
+    expect(getResources()).toEqual(ac.getResources().sort());
   });
 
   it(`returns all known getRoles()`, () => {
@@ -17,12 +17,14 @@ describe.only('AccessControlRe', () => {
   });
 
   it(`returns all known getActions() & implicitelly allows custom actions`, () => {
-    expect(getActions()).toEqual(['create', 'read', 'update', 'delete', 'like', 'approve'].sort());
+    expect(getActions()).toEqual(
+      ['create', 'read', 'update', 'delete', 'like', 'approve', 'look'].sort()
+    );
   });
-  
-  it.skip(`allows custom actions`, () => {});
 
-  it(`user can like ANY comment`, () => {
+  it.skip(``, () => {}); // covered below :-)
+
+  it(`allows custom actions, since a "user" can "like" ANY "comment"`, () => {
     expect(
       ac.permission({
         role: 'user',
@@ -33,13 +35,13 @@ describe.only('AccessControlRe', () => {
     ).toEqual(true);
   });
 
-  it(`user can not delete ANY post`, () => {
+  it(`possession in "action:possession" overrides "possession", since "user" can not "delete" ANY "post"`, () => {
     expect(
       ac.permission({
         role: 'user',
         action: 'delete',
         possession: 'any',
-        resource: 'comment',
+        resource: 'post',
       }).granted
     ).toEqual(false);
   });
@@ -54,42 +56,60 @@ describe.only('AccessControlRe', () => {
     ).toEqual(true);
   });
 
-  describe(`wildcard '*' for Action & Resource`, () => {
-    for (const action of getActions()) {
-      for (const resource of getResources()) {
-        it(`GOD can do ANY *Action (${action}) to ANY *Resource (${resource}) `, () => {
-          expect(
-            ac.permission({
-              role: 'god',
-              possession: 'any',
-              resource,
-              action,
-            }).granted
-          ).toEqual(true);
-        });
+  describe(`wildcard '*' for Role, Action & Resource`, () => {
+    describe(`*Action & *Resource, creating GOD and PowerUsers roles:`, () => {
+      for (const action of getActions()) {
+        for (const resource of getResources()) {
+          it(`GOD can do ANY *Action (${action}) to ANY *Resource (${resource}) `, () => {
+            expect(
+              ac.permission({
+                role: 'god',
+                possession: 'any',
+                resource,
+                action,
+              }).granted
+            ).toEqual(true);
+          });
 
-        it(`poweruser can NOT do ANY *Action (${action}) to any *Resource (${resource}) `, () => {
-          expect(
-            ac.permission({
-              role: 'poweruser',
-              possession: 'any',
-              resource,
-              action,
-            }).granted
-          ).toEqual(false);
-        });
+          if (resource !== 'openToAllResource')
+            it(`poweruser can NOT do ANY *Action (${action}) to any *Resource (${resource}) `, () => {
+              expect(
+                ac.permission({
+                  role: 'poweruser',
+                  possession: 'any',
+                  resource,
+                  action,
+                }).granted
+              ).toEqual(false);
+            });
 
-        it(`poweruser can do ANY *Action (${action}) to OWN *Resource (${resource}) `, () => {
-          expect(
-            ac.permission({
-              role: 'poweruser',
-              possession: 'own',
-              resource,
-              action,
-            }).granted
-          ).toEqual(true);
-        });
+          it(`poweruser can do ANY *Action (${action}) only to OWN *Resource (${resource}) `, () => {
+            expect(
+              ac.permission({
+                role: 'poweruser',
+                possession: 'own',
+                resource,
+                action,
+              }).granted
+            ).toEqual(true);
+          });
+        }
       }
-    }
+
+      describe(`*Roles create open to all Resources / Actions:`, () => {
+        for (const role of getRoles()) {
+          it(`Any *Role (${role} can "look" at any "openToAllResource"`, () => {
+            expect(
+              ac.permission({
+                role,
+                possession: 'any',
+                resource: 'openToAllResource',
+                action: 'look',
+              }).granted
+            ).toEqual(true);
+          });
+        }
+      });
+    });
   });
 });

@@ -15,24 +15,29 @@ export const build = _.once(
   (): AccessControl => {
     const actions = getActions();
     const resources = getResources();
+    const roles = getRoles();
 
     addCustomActions(actions); // allow custom actions (patching AccessControl)
 
     const ac: AccessControl = new AccessControl();
     for (const ai of accessInfos) {
-      const [action, possession] = ai.action.split(':');
+      const [action, actionPossession] = ai.action.split(':');
+      // arrayize ai.role
+      ai.role = _.isArray(ai.role) ? ai.role : [ai.role];
 
-      // grant all known actions / resources with * wildcards ?
+      // grant all known actions / resources / roles with * wildcards ?
       const actionsToGrant = action === '*' ? actions : [action];
       const resourcesToGrant = ai.resource === '*' ? resources : [ai.resource];
+      const rolesToGrant = ai.role.includes('*') ? roles : ai.role;
 
       for (const actionToGrant of actionsToGrant) {
         for (const resourceToGrant of resourcesToGrant) {
           const accessInfo: IAccessInfo = {
-            possession,
             ...ai,
+            possession: actionPossession || ai.possession || 'any',
             action: actionToGrant,
             resource: resourceToGrant,
+            role: rolesToGrant,
           };
 
           ac.grant(accessInfo);
@@ -103,6 +108,7 @@ export const getActions = (): string[] => {
 
 // utils
 export const cleanStarEtc = _.flow(
+  _f.flatten,
   _f.remove(_f.isEqual('*')),
   _f.uniq,
   _f.sortBy(_f.identity)
