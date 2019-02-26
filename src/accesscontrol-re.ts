@@ -39,8 +39,8 @@ export const build = _.once(
             resource: resourceToGrant,
             role: rolesToGrant,
           };
-
-          ac.grant(accessInfo);
+  
+          accessInfo.denied ? ac.deny(accessInfo) : ac.grant(accessInfo);
         }
       }
     }

@@ -32,7 +32,11 @@ A facade enhancing the great javascript [Access Control](https://onury.io/access
         action: 'look:any',
       }
       
-  You can of course use any combination, even `'*'` for *permit all* :-) 
+  You can of course use any combination, even `'*'` for *permit all* :-)
+  
+- Solving various smaller issues and bugs: 
+  
+  - Not respecting `denied: true` of `IAccessInfo` in `AccessControl.grant` - https://github.com/onury/accesscontrol/issues/67   
    
 ## How to use
 
@@ -48,7 +52,7 @@ A facade enhancing the great javascript [Access Control](https://onury.io/access
         }, ...
     ]
 
-    addAccessInfo(accessInfos);        // also accepts a single accessInfo
+    addAccessInfo(accessInfos);        // also accepts a single IAccessInfo
     const ac: AccessControl = build(); // @note: can call only `_.once`!
     
     // you should use `ac.permission()` only from now on :-)

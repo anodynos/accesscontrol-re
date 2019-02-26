@@ -22,8 +22,6 @@ describe.only('AccessControlRe', () => {
     );
   });
 
-  it.skip(``, () => {}); // covered below :-)
-
   it(`allows custom actions, since a "user" can "like" ANY "comment"`, () => {
     expect(
       ac.permission({
@@ -46,12 +44,22 @@ describe.only('AccessControlRe', () => {
     ).toEqual(false);
   });
 
-  it(`admin can delete ANY post`, () => {
+  it(`'denied: true' in IAccessInfo is respected - user CANNOT approve ANY post`, () => {
     expect(
       ac.permission({
-        role: 'admin',
-        action: 'delete:any',
-        resource: 'comment',
+        role: 'user',
+        action: 'approve:any',
+        resource: 'post',
+      }).granted
+    ).toEqual(false);
+  });
+  
+  it(`'denied: false' in IAccessInfo is respected - user CAN approve OWN post`, () => {
+    expect(
+      ac.permission({
+        role: 'user',
+        action: 'approve:own',
+        resource: 'post',
       }).granted
     ).toEqual(true);
   });

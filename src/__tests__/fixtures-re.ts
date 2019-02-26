@@ -3,43 +3,50 @@ import { IAccessInfo } from 'accesscontrol';
 export const accessInfos: IAccessInfo[] = [
   {
     role: 'user',
-    resource: 'comment',
     action: 'like:any',
+    resource: 'comment',
     attributes: ['*'],
   },
   {
     role: ['user'],
-    resource: 'post',
-    possession: 'any', // overriden by action's possession
     action: 'delete:own',
-  },
-  {
-    role: 'admin',
-    resource: 'comment',
-    possession: 'any',
-    action: 'delete',
-    attributes: ['*'],
-  },
-  {
-    role: ['admin'],
+    possession: 'any', // overriden by action's possession
     resource: 'post',
-    action: 'approve', // possession `any` assumed
+  },
+  {
+    role: ['admin', 'user'], // user will be actually denied below
+    action: 'approve',      // possession `any` assumed
+    resource: 'post',
     attributes: ['*'],
+  },
+  {
+    role: ['user'],
+    action: 'approve',
+    resource: 'post',
+    attributes: ['*'],
+    denied: true // should be respected - // https://github.com/onury/accesscontrol/issues/67
+  },
+  {
+    role: ['user'],
+    action: 'approve:own',
+    resource: 'post',
+    attributes: ['*'],
+    denied: false // should be respected - // https://github.com/onury/accesscontrol/issues/67
   },
   {
     role: 'god',
-    resource: '*',
     action: '*:any',
+    resource: '*',
   },
   {
     role: 'poweruser',
+    action: '*:own', // overrides `possession: 'any'`
     resource: '*',
     possession: 'any',
-    action: '*:own', // overrides `possession: 'any'`
   },
   {
     role: '*',
-    resource: 'openToAllResource',
     action: 'look:any',
+    resource: 'openToAllResource',
   },
 ];
