@@ -1,23 +1,24 @@
 import { accessInfos } from './fixtures-re';
-import { addAccessInfo, build, getActions, getResources, getRoles } from '../accesscontrol-re';
+import { AcccessControlRe } from '../accesscontrol-re';
 import { AccessControl } from 'accesscontrol';
 
-addAccessInfo(accessInfos);
-const ac: AccessControl = build();
+const acre = new AcccessControlRe();
+acre.addAccessInfo(accessInfos);
+const ac: AccessControl = acre.build();
 
-describe.only('AccessControlRe', () => {
+describe('AccessControlRe', () => {
   it(`returns all known getResources()`, () => {
-    expect(getResources()).toEqual(['comment', 'post', 'openToAllResource'].sort());
-    expect(getResources()).toEqual(ac.getResources().sort());
+    expect(acre.getResources()).toEqual(['comment', 'post', 'openToAllResource'].sort());
+    expect(acre.getResources()).toEqual(ac.getResources().sort());
   });
 
   it(`returns all known getRoles()`, () => {
-    expect(getRoles()).toEqual(['admin', 'god', 'poweruser', 'user']);
-    expect(getRoles()).toEqual(ac.getRoles().sort());
+    expect(acre.getRoles()).toEqual(['admin', 'god', 'poweruser', 'user']);
+    expect(acre.getRoles()).toEqual(ac.getRoles().sort());
   });
 
   it(`returns all known getActions() & implicitelly allows custom actions`, () => {
-    expect(getActions()).toEqual(
+    expect(acre.getActions()).toEqual(
       ['create', 'read', 'update', 'delete', 'like', 'approve', 'look'].sort()
     );
   });
@@ -66,8 +67,8 @@ describe.only('AccessControlRe', () => {
 
   describe(`wildcard '*' for Role, Action & Resource`, () => {
     describe(`*Action & *Resource, creating GOD and PowerUsers roles:`, () => {
-      for (const action of getActions()) {
-        for (const resource of getResources()) {
+      for (const action of acre.getActions()) {
+        for (const resource of acre.getResources()) {
           it(`GOD can do ANY *Action (${action}) to ANY *Resource (${resource}) `, () => {
             expect(
               ac.permission({
@@ -105,7 +106,7 @@ describe.only('AccessControlRe', () => {
       }
 
       describe(`*Roles create open to all Resources / Actions:`, () => {
-        for (const role of getRoles()) {
+        for (const role of acre.getRoles()) {
           it(`Any *Role (${role} can "look" at any "openToAllResource"`, () => {
             expect(
               ac.permission({

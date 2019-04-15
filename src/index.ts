@@ -1,1 +1,1 @@
-export {addAccessInfo, build, getActions} from './accesscontrol-re';
+export { AcccessControlRe } from './accesscontrol-re';
