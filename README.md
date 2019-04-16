@@ -40,26 +40,34 @@ A facade enhancing the great javascript [Access Control](https://onury.io/access
    
 ## How to use
 
-    import { IAccessInfo } from 'accesscontrol';
-    import { addAccessInfo, build } from 'accesscontrol-re';
-  
-    const accessInfos: IAccessInfo[] = [
-        {
-          role: 'user',
-          resource: 'comment',
-          action: 'list:any',
-          attributes: ['*', '!secret'],
-        }, ...
-    ]
-
-    addAccessInfo(accessInfos);        // also accepts a single IAccessInfo
-    const ac: AccessControl = build(); // @note: can call only `_.once`!
+    import { AcccessControlRe } from '../../src';
+    import { AccessControl, Access, IAccessInfo } from 'accesscontrol';
     
-    // you should use `ac.permission()` only from now on :-)
+    const accessInfos: IAccessInfo[] = [
+      {
+        role: 'user',
+        resource: 'comment',
+        action: 'list:any',
+        attributes: ['*', '!secret'],
+      },
+    ];
+    
+    const acre = new AcccessControlRe();
+    acre.addAccessInfo(accessInfos);        // also accepts a single IAccessInfo
+    const ac: AccessControl = acre.build(); // can call only `_.once` pre instance!
+    
+    // you can use `ac.permission()` (and only that!) from now on :-)
+    const userPerm = ac.permission({
+      role: 'user',
+      resource: 'comment',
+      action: 'list:own',
+    });
+    
+    console.log('USER', userPerm.granted);
     
 ## Caveats
 
-- Only the `.grant(accessInfo: IAccessInfo)` and `.permission(queryInfo: IQueryInfo)` are supported for now, not the chained fluent methods like `createAny` & `updateOwn` or the `grantsObject` etc. The upside of this is that you can do anything without just those, and they are cleaner and easier to use for DB or bulk creation & querying of permissions than the fluent ones. 
+- Only the `.grant(accessInfo: IAccessInfo)` (implicitly and only through `AcccessControlRe::addAccessInfo(accessInfo: IAccessInfo)`) and `ac.permission(queryInfo: IQueryInfo)` are supported for now, not the chained fluent methods like `createAny` & `updateOwn` or the `grantsObject` etc. The upside of this is that you can do anything without just those, and they are cleaner and easier to use for DB or bulk creation & querying of permissions than the fluent ones. 
  This problem could be solved with an ES6 Proxy, but I wont even bother :-)
 
 - There is some patching going on, as this is *not a fork* or reworked version of Access Control, just a facade. This is actually a very good point, cause Access Control version 2.x is just in `peerdependencies` so its updates on your local version will be picked up.
@@ -82,6 +90,8 @@ A facade enhancing the great javascript [Access Control](https://onury.io/access
 
 - If other goodies and Access Control issues solved via this facade seem important, they will get here!
 
+- DONE: ~~Refactor to a class~~
+ 
 - PRs, with tests + rationale, more than welcome :-)
 
 # Licence
