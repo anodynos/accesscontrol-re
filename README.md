@@ -1,4 +1,4 @@
-# Access Control Re
+# Access Control Re v2.0.0
 
 A facade enhancing the great javascript [Access Control](https://onury.io/accesscontrol), but with much desired missing features!
 
@@ -40,7 +40,7 @@ A facade enhancing the great javascript [Access Control](https://onury.io/access
    
 ## How to use
 
-    import { AcccessControlRe } from '../../src';
+    import { AcccessControlRe } from 'accesscontrol-re';;
     import { AccessControl, Access, IAccessInfo } from 'accesscontrol';
     
     const accessInfos: IAccessInfo[] = [
@@ -52,7 +52,7 @@ A facade enhancing the great javascript [Access Control](https://onury.io/access
       },
     ];
     
-    const acre = new AcccessControlRe();
+    const acre = new AccessControlRe();
     acre.addAccessInfo(accessInfos);        // also accepts a single IAccessInfo
     const ac: AccessControl = acre.build(); // can call only `_.once` pre instance!
     
@@ -67,7 +67,7 @@ A facade enhancing the great javascript [Access Control](https://onury.io/access
     
 ## Caveats
 
-- Only the `.grant(accessInfo: IAccessInfo)` (implicitly and only through `AcccessControlRe::addAccessInfo(accessInfo: IAccessInfo)`) and `ac.permission(queryInfo: IQueryInfo)` are supported for now, not the chained fluent methods like `createAny` & `updateOwn` or the `grantsObject` etc. The upside of this is that you can do anything without just those, and they are cleaner and easier to use for DB or bulk creation & querying of permissions than the fluent ones. 
+- Only the `.grant(accessInfo: IAccessInfo)` (implicitly and only through `AccessControlRe::addAccessInfo(accessInfo: IAccessInfo)`) and `ac.permission(queryInfo: IQueryInfo)` are supported for now, not the chained fluent methods like `createAny` & `updateOwn` or the `grantsObject` etc. The upside of this is that you can do anything without just those, and they are cleaner and easier to use for DB or bulk creation & querying of permissions than the fluent ones. 
  This problem could be solved with an ES6 Proxy, but I wont even bother :-)
 
 - There is some patching going on, as this is *not a fork* or reworked version of Access Control, just a facade. This is actually a very good point, cause Access Control version 2.x is just in `peerdependencies` so its updates on your local version will be picked up.

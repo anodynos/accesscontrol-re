@@ -1,1 +1,1 @@
-export { AcccessControlRe } from './accesscontrol-re';
+export { AccessControlRe } from './accesscontrol-re';

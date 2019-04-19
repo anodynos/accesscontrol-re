@@ -1,8 +1,8 @@
 import { accessInfos } from './fixtures-re';
-import { AcccessControlRe } from '../accesscontrol-re';
+import { AccessControlRe } from '../accesscontrol-re';
 import { AccessControl } from 'accesscontrol';
 
-const acre = new AcccessControlRe();
+const acre = new AccessControlRe();
 acre.addAccessInfo(accessInfos);
 const ac: AccessControl = acre.build();
 
