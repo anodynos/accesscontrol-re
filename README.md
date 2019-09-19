@@ -37,7 +37,7 @@ A facade enhancing the great javascript [Access Control](https://onury.io/access
 - In **AccessControl**, `AccessControl.grant` is NOT respecting `denied: true` of that `IAccessInfo` (see https://github.com/onury/accesscontrol/issues/67). **AccessControlRe** instead properly handles it they way someone would expect.     
   
 - In **AccessControl**, `accessControl.permission()` throws an Error `AccessControlError: Invalid role(s): []` when empty roles (eg a User with an empty `roles: []`) is passed in that `IQueryInfo`.
- **AccessControlRe** instead silently overcomes it (and returns a `permission.granted === false`). The reasoning is that and empty roles array fo the User is something allowed in the real world (eg a new user without any assigned roles).
+ **AccessControlRe** instead silently overcomes it (and returns a `permission.granted === false`). reasoning is that an empty roles array foR the User, is something normal in the real world (eg a new user without any assigned roles).
    
 ## How to use
 
