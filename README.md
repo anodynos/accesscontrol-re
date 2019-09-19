@@ -1,4 +1,4 @@
-# Access Control Re v3.0.1
+# Access Control Re v3.1.0
 
 A facade enhancing the great javascript [Access Control](https://onury.io/accesscontrol), but with much desired missing features!
 
@@ -95,29 +95,37 @@ Optionally pass an initial `accessInfo` to add to your instance.
 
 ### addAccessInfo(accessInfo: IAccessInfo | IAccessInfo[]): AccessControlRe
 
-Call it as many times as you want (but before calling `.build()`) to add new `accessInfos` to your instance. 
+Call it as many times as you want (but before calling `.build()`) to add new `accessInfos` to your instance.
+
+At this point you still dont have an `.accessControl` instance (its `null`), nor you can call `.permission()` - you need to call `.build()` for this. 
 
 ### build(): AccessControlRe
 
-You **have to call it** after you've finished adding ALL your `accessInfos`. After calling `.build()` you can't call `.addAccessInfo()` again on that instance.  
+You **have to call it** after you've finished adding ALL your `accessInfos`.
 
-Internally, it creates the tweaked AccessControl instance that you can start query with `.permission()`.   
+After calling `.build()` you CAN NOT call `.addAccessInfo()` again on that instance.  
+
+Internally, it creates the tweaked `AccessControl` instance (exposed as `.accessControl`) and you can start querying your permissions with `accessControlRe.permission()`.   
 
 ### permission(queryInfo: IQueryInfo): Permission {
 
-Works like `AccessControl.permission()` - see node_modules/accesscontrol/lib/AccessControl.d.ts
+Works like `AccessControl.permission()` (see node_modules/accesscontrol/lib/AccessControl.d.ts) but solves the empty `roles` problem (and more in the future) so its preferred over `AccessControl.permission()` 
 
 ###  getRoles(): string[]
 
 Get all available roles (sorted).
    
-### getResources: string[]
+### getResources(): string[]
 
 Get all available resources (sorted).
 
-### getActions: string[]
+### getActions(): string[]
 
 Get all available actions (sorted).
+
+### accessControl: AccessControl
+
+The **AccessControl** instance, should you need it. 
 
 ## Coming up
 

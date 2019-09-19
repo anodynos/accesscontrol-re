@@ -35,7 +35,7 @@ const addCustomActions = (customActions: string[]) => {
 
 export class AccessControlRe {
   private accessInfos: IAccessInfo[] = [];
-  private _accessControl: AccessControl = new AccessControl();
+  public accessControl: AccessControl = null;
 
   constructor(accessInfo?: IAccessInfo | IAccessInfo[]) {
     if (accessInfo) this.addAccessInfo(accessInfo);
@@ -54,6 +54,8 @@ export class AccessControlRe {
 
   public build = _.once(
     (): AccessControlRe => {
+      this.accessControl = new AccessControl();
+
       const actions = this.getActions();
       const resources = this.getResources();
       const roles = this.getRoles();
@@ -82,20 +84,20 @@ export class AccessControlRe {
             };
 
             accessInfo.denied
-              ? this._accessControl.deny(accessInfo)
-              : this._accessControl.grant(accessInfo);
+              ? this.accessControl.deny(accessInfo)
+              : this.accessControl.grant(accessInfo);
           }
         }
 
         // grant a deny (!) to __INTERNAL_DUMMY_ROLE__
-        this._accessControl.deny({
+        this.accessControl.deny({
           action: __INTERNAL_DUMMY_ROLE__,
           role: __INTERNAL_DUMMY_ROLE__,
           resource: __INTERNAL_DUMMY_ROLE__,
         });
       }
 
-      this._accessControl.lock();
+      this.accessControl.lock();
 
       return this;
     }
@@ -104,11 +106,17 @@ export class AccessControlRe {
   // Instead of calling `accessControl.permission()` we force user to delegate to it via AccessControlRe.
   // This allows us to do things like solving the empty roles which is throwing of AccessControl.
   // @see node_modules/accesscontrol/lib/AccessControl.d.ts
-  public permission = (queryInfo: IQueryInfo): Permission =>
-    this._accessControl.permission({
+  public permission = (queryInfo: IQueryInfo): Permission => {
+    if (!this.accessControl)
+      throw new Error(
+        'AccessControlRe Error: you need to call `.build()` first, before calling `.permission()`'
+      );
+
+    return this.accessControl.permission({
       ...queryInfo,
       role: _.isEmpty(queryInfo.role) ? __INTERNAL_DUMMY_ROLE__ : queryInfo.role,
     });
+  };
 
   // Some helpers
 
