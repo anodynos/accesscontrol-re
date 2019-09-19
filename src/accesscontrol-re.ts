@@ -18,6 +18,8 @@ Note: accesscontrol/lib/enums = {
   possessions: [ 'own', 'any' ] }
 */
 
+const __INTERNAL_DUMMY_ROLE__ = '__INTERNAL_DUMMY_ROLE__';
+
 import { Action, actions, Possession, possessions } from 'accesscontrol/lib/enums';
 const crudActions = [...actions];
 
@@ -53,7 +55,7 @@ export class AccessControlRe {
       const roles = this.getRoles();
 
       // allow custom actions (i.e patch AccessControl) - see note in method
-      addCustomActions(actions);
+      addCustomActions(actions.concat(__INTERNAL_DUMMY_ROLE__));
 
       for (const ai of this.accessInfos) {
         const [action, actionPossession] = ai.action.split(':');
@@ -80,6 +82,13 @@ export class AccessControlRe {
               : this._accessControl.grant(accessInfo);
           }
         }
+
+        // grant a deny (!) to __INTERNAL_DUMMY_ROLE__
+        this._accessControl.deny({
+          action: __INTERNAL_DUMMY_ROLE__,
+          role: __INTERNAL_DUMMY_ROLE__,
+          resource: __INTERNAL_DUMMY_ROLE__,
+        });
       }
 
       this._accessControl.lock();
@@ -92,6 +101,13 @@ export class AccessControlRe {
   // This allows us to do things like solving the empty roles throwing of AccessControl
   // @see node_modules/accesscontrol/lib/AccessControl.d.ts
   public permission(queryInfo: IQueryInfo): Permission {
+    if (_.isEmpty(queryInfo.role)) {
+      queryInfo = {
+        ...queryInfo,
+        role: __INTERNAL_DUMMY_ROLE__,
+      };
+    }
+
     return this._accessControl.permission(queryInfo);
   }
 

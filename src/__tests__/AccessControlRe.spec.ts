@@ -1,6 +1,5 @@
 import { accessInfos } from './fixtures-re';
 import { AccessControlRe } from '../accesscontrol-re';
-import { AccessControl } from 'accesscontrol';
 
 const acre = new AccessControlRe().addAccessInfo(accessInfos).build();
 
@@ -116,5 +115,15 @@ describe('AccessControlRe', () => {
         }
       });
     });
+  });
+
+  it('doesnt throw error on permission with empty user.roles', async () => {
+    expect(
+      acre.permission({
+        role: [],
+        resource: 'openToAllResource',
+        action: 'look',
+      }).granted
+    ).toEqual(false);
   });
 });
