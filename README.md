@@ -1,4 +1,4 @@
-# Access Control Re v2.0.0
+# Access Control Re v3.0.0
 
 A facade enhancing the great javascript [Access Control](https://onury.io/accesscontrol), but with much desired missing features!
 
