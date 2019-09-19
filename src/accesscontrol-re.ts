@@ -37,6 +37,10 @@ export class AccessControlRe {
   private accessInfos: IAccessInfo[] = [];
   private _accessControl: AccessControl = new AccessControl();
 
+  constructor(accessInfo?: IAccessInfo | IAccessInfo[]) {
+    if (accessInfo) this.addAccessInfo(accessInfo);
+  }
+
   public addAccessInfo = (accessInfo: IAccessInfo | IAccessInfo[]): AccessControlRe => {
     if (!accessInfo || !_.isObject(accessInfo))
       throw new Error(`Invalid accessInfo:\n${JSON.stringify(accessInfo)}`);
@@ -97,41 +101,33 @@ export class AccessControlRe {
     }
   );
 
-  // Instead of calling `accessControl.permission()` we force use to delegate it to us.
-  // This allows us to do things like solving the empty roles throwing of AccessControl
+  // Instead of calling `accessControl.permission()` we force user to delegate to it via AccessControlRe.
+  // This allows us to do things like solving the empty roles which is throwing of AccessControl.
   // @see node_modules/accesscontrol/lib/AccessControl.d.ts
-  public permission(queryInfo: IQueryInfo): Permission {
-    if (_.isEmpty(queryInfo.role)) {
-      queryInfo = {
-        ...queryInfo,
-        role: __INTERNAL_DUMMY_ROLE__,
-      };
-    }
-
-    return this._accessControl.permission(queryInfo);
-  }
+  public permission = (queryInfo: IQueryInfo): Permission =>
+    this._accessControl.permission({
+      ...queryInfo,
+      role: _.isEmpty(queryInfo.role) ? __INTERNAL_DUMMY_ROLE__ : queryInfo.role,
+    });
 
   // Some helpers
 
   /**
    * Get all available roles
    */
-  public getRoles = (): string[] => {
-    return cleanStarEtc(_.map(this.accessInfos, ai => ai.role));
-  };
+  public getRoles = (): string[] => cleanStarEtc(_.map(this.accessInfos, ai => ai.role)).sort();
 
   /**
    * Get all available resources
    */
-  public getResources = (): string[] => {
-    return cleanStarEtc(_.map(this.accessInfos, ai => ai.resource));
-  };
+  public getResources = (): string[] =>
+    cleanStarEtc(_.map(this.accessInfos, ai => ai.resource)).sort();
 
   /**
    * Get all available actions
    */
-  public getActions = (): string[] => {
-    return cleanStarEtc(
+  public getActions = (): string[] =>
+    cleanStarEtc(
       _.reduce(
         this.accessInfos,
         (actions, accessInfo) => {
@@ -140,9 +136,10 @@ export class AccessControlRe {
           return actions;
         },
         []
-      ).concat(crudActions)
+      )
+        .concat(crudActions)
+        .sort()
     );
-  };
 }
 
 // utils

@@ -1,7 +1,7 @@
 import { accessInfos } from './fixtures-re';
 import { AccessControlRe } from '../accesscontrol-re';
 
-const acre = new AccessControlRe().addAccessInfo(accessInfos).build();
+const acre = new AccessControlRe(accessInfos).build();
 
 describe('AccessControlRe', () => {
   it(`returns all known getResources()`, () => {
