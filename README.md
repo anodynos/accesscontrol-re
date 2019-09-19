@@ -1,4 +1,4 @@
-# Access Control Re v2.0.0
+# Access Control Re v3.0.0
 
 A facade enhancing the great javascript [Access Control](https://onury.io/accesscontrol), but with much desired missing features!
 
@@ -34,14 +34,16 @@ A facade enhancing the great javascript [Access Control](https://onury.io/access
       
   You can of course use any combination, even `'*'` for *permit all* :-)
   
-- Solving various smaller issues and bugs: 
+- In **AccessControl**, `AccessControl.grant` is NOT respecting `denied: true` of that `IAccessInfo` (see https://github.com/onury/accesscontrol/issues/67). **AccessControlRe** instead properly handles it they way someone would expect.     
   
-  - Not respecting `denied: true` of `IAccessInfo` in `AccessControl.grant` - https://github.com/onury/accesscontrol/issues/67   
+- In **AccessControl**, `accessControl.permission()` throws an Error `AccessControlError: Invalid role(s): []` when empty roles (eg a User with an empty `roles: []`) is passed in that `IQueryInfo`.
+ **AccessControlRe** instead silently overcomes it (and returns a `permission.granted === false`). Reasoning is that an empty roles array foR the User, is something normal in the real world (eg a new user without any assigned roles).
    
 ## How to use
 
-    import { AcccessControlRe } from 'accesscontrol-re';;
-    import { AccessControl, Access, IAccessInfo } from 'accesscontrol';
+```typescript
+    import { IAccessInfo, Permission } from 'accesscontrol';
+    import { AccessControlRe } from 'accesscontrol-re';
     
     const accessInfos: IAccessInfo[] = [
       {
@@ -54,31 +56,68 @@ A facade enhancing the great javascript [Access Control](https://onury.io/access
     
     const acre = new AccessControlRe();
     acre.addAccessInfo(accessInfos);        // also accepts a single IAccessInfo
-    const ac: AccessControl = acre.build(); // can call only `_.once` pre instance!
+    acre.addAccessInfo(accessInfos);        // repeat as many times as needed
+    acre.build();                           // call `build()` to start querying (only `_.once` per instance)!
     
-    // you can use `ac.permission()` (and only that!) from now on :-)
-    const userPerm = ac.permission({
+    // the above can be done fluently in one statement
+    const acre2 = new AccessControlRe(accessInfos).build();
+    
+    // From now on, you use `acre.permission()` - there is no need to use anything else from AccessControl :-)
+    // It has the exact signature & usage as `accessControl.permission` (it delegates to it) and also returns a `Permission`
+    const userPerm: Permission = acre.permission({
       role: 'user',
       resource: 'comment',
       action: 'list:own',
     });
     
     console.log('USER', userPerm.granted);
+```
     
 ## Caveats
 
-- Only the `.grant(accessInfo: IAccessInfo)` (implicitly and only through `AccessControlRe::addAccessInfo(accessInfo: IAccessInfo)`) and `ac.permission(queryInfo: IQueryInfo)` are supported for now, not the chained fluent methods like `createAny` & `updateOwn` or the `grantsObject` etc. The upside of this is that you can do anything without just those, and they are cleaner and easier to use for DB or bulk creation & querying of permissions than the fluent ones. 
- This problem could be solved with an ES6 Proxy, but I wont even bother :-)
+- Only the `.grant(accessInfo: IAccessInfo)` (implicitly and only through `AccessControlRe::addAccessInfo(accessInfo: IAccessInfo)`) and `AccessControlRe::permission(queryInfo: IQueryInfo)` are supported for now, not the chained fluent methods like `createAny` & `updateOwn` or the `grantsObject` etc of **AccessControl**. The upside of this is that you can do anything without those, and it is actually cleaner and easier to use and follow for DB or bulk creation & querying of permissions than the fluent ones. 
 
 - There is some patching going on, as this is *not a fork* or reworked version of Access Control, just a facade. This is actually a very good point, cause Access Control version 2.x is just in `peerdependencies` so its updates on your local version will be picked up.
 
-- You need to create ALL your grants (i.e add all your `addAccessInfo`) before you can use it & call `.build` to retrieve an ActionControl instance with the grants locked. This is due to the way the `'*'` actions & resources actually work: the `'*'` is forcing all known actions / resources / roles to be created. Also you can call `build()` only `_.once`, it has no effect after that (use `require-clean` if you want a fresh instance :-).  
+- You need to create ALL your grants (i.e add all your `addAccessInfo()`) before you can use it & call `.build()` to retrieve an ActionControl instance with the grants locked. This is due to the way the `'*'` actions & resources actually work: the `'*'` is forcing all known actions / resources / roles to be created. Also you can call `build()` only `_.once`, it has no effect after that (use `require-clean` if you want a fresh instance :-).  
 
 - @todo: `.extend` is disabled by design and is discouraged, for your own sake. Its evil to use while this is open https://github.com/onury/accesscontrol/issues/34#issuecomment-466387586 - when closed I'll happily add it :-) 
 
 - Using `'*'` for *Action*, it grants access to *all known Actions* against the Resource, event if the Resource doesn't support some of these Actions. It shouldn't do any harm :-)
 
 - Order of `addAccessInfo`, matters!
+
+## Public API
+
+### constructor AccessControlRe(accessInfo?: IAccessInfo | IAccessInfo[])
+
+Optionally pass an initial `accessInfo` to add to your instance.
+
+### addAccessInfo(accessInfo: IAccessInfo | IAccessInfo[]): AccessControlRe
+
+Call it as many times as you want (but before calling `.build()`) to add new `accessInfos` to your instance. 
+
+### build(): AccessControlRe
+
+You **have to call it** after you've finished adding ALL your `accessInfos`. After calling `.build()` you can't call `.addAccessInfo()` again on that instance.  
+
+Internally, it creates the tweaked AccessControl instance that you can start query with `.permission()`.   
+
+### permission(queryInfo: IQueryInfo): Permission {
+
+Works like `AccessControl.permission()` - see node_modules/accesscontrol/lib/AccessControl.d.ts
+
+###  getRoles(): string[]
+
+Get all available roles (sorted).
+   
+### getResources: string[]
+
+Get all available resources (sorted).
+
+### getActions: string[]
+
+Get all available actions (sorted).
 
 ## Coming up
 
