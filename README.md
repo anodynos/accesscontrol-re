@@ -37,12 +37,13 @@ A facade enhancing the great javascript [Access Control](https://onury.io/access
 - In **AccessControl**, `AccessControl.grant` is NOT respecting `denied: true` of that `IAccessInfo` (see https://github.com/onury/accesscontrol/issues/67). **AccessControlRe** instead properly handles it they way someone would expect.     
   
 - In **AccessControl**, `accessControl.permission()` throws an Error `AccessControlError: Invalid role(s): []` when empty roles (eg a User with an empty `roles: []`) is passed in that `IQueryInfo`.
- **AccessControlRe** instead silently overcomes it (and returns a `permission.granted === false`). reasoning is that an empty roles array foR the User, is something normal in the real world (eg a new user without any assigned roles).
+ **AccessControlRe** instead silently overcomes it (and returns a `permission.granted === false`). Reasoning is that an empty roles array foR the User, is something normal in the real world (eg a new user without any assigned roles).
    
 ## How to use
 
+```typescript
     import { IAccessInfo, Permission } from 'accesscontrol';
-    import { AccessControlRe } from '../src';
+    import { AccessControlRe } from 'accesscontrol-re';
     
     const accessInfos: IAccessInfo[] = [
       {
@@ -55,15 +56,14 @@ A facade enhancing the great javascript [Access Control](https://onury.io/access
     
     const acre = new AccessControlRe();
     acre.addAccessInfo(accessInfos);        // also accepts a single IAccessInfo
-    acre.addAccessInfo(accessInfos);        // repeat as many
+    acre.addAccessInfo(accessInfos);        // repeat as many times as needed
     acre.build();                           // call `build()` to start querying (only `_.once` per instance)!
     
     // the above can be done fluently in one statement
     const acre2 = new AccessControlRe(accessInfos).build();
     
-    // From then on, you use `acre.permission()` - there is no need to use anything else from AccessControl :-)
+    // From now on, you use `acre.permission()` - there is no need to use anything else from AccessControl :-)
     // It has the exact signature & usage as `accessControl.permission` (it delegates to it) and also returns a `Permission`
-
     const userPerm: Permission = acre.permission({
       role: 'user',
       resource: 'comment',
@@ -71,6 +71,7 @@ A facade enhancing the great javascript [Access Control](https://onury.io/access
     });
     
     console.log('USER', userPerm.granted);
+```
     
 ## Caveats
 
