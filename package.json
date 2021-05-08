@@ -14,7 +14,7 @@
     "format": "npm-run-all prettier tslint prettier"
   },
   "dependencies": {
-    "lodash": "^4.17.15"
+    "lodash": "^4.17.21"
   },
   "peerDependencies": {
     "accesscontrol": "^2.2.1"
